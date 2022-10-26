@@ -28,11 +28,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     lo.getCurrentLocation();
 
-    String latitude = lo.latitude as String;
-    String longitude = lo.longitude as String;
-
-    print('Latitude: $latitude');
-    print('Latitude: $longitude');
+    //print(lo.latitude);
+    //print(lo.longitude);
   }
 
   @override
