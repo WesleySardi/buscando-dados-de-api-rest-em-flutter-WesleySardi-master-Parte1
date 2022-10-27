@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tempo_template/services/location.dart';
+import 'package:tempo_template/services/networking.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+
+import '../services/weather.dart';
+import 'location_screen.dart';
+
+const apiKey = 'c7e803ecb444bf521ed5e2b74a9f7aa6';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -11,39 +20,43 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  void getData() async {
-    var url = Uri.parse('https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22');
-    http.Response response = await http.get(url);
+  late double latitude;
+  late double longitude;
 
-    if (response.statusCode == 200) { // se a requisição foi feita com sucesso
-      var data = response.body;
-      print(data);  // imprima o resultado
-    } else {
-      print(response.statusCode);  // senão, imprima o código de erro
-    }
+  void pushToLocationScreen(dynamic weatherData) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return LocationScreen(localWeatherData: weatherData);
+    }));
+  }
+
+  void getData() async {
+    var weatherData = await WeatherModel().getLocationWeather();
+    pushToLocationScreen(weatherData);
   }
 
   Future<void> getLocation() async {
-    Location lo = Location();
+    var location = Location();
+    await location.getCurrentLocation();
 
-    lo.getCurrentLocation();
+    latitude = location.latitude!;
+    longitude = location.longitude!;
 
-    //print(lo.latitude);
-    //print(lo.longitude);
+    getData();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getLocation();
+    getData();
   }
 
   @override
   Widget build(BuildContext context) {
-    getData();
-    return Scaffold(
-
+    return const Center(
+      child: SpinKitDoubleBounce(
+        color: Colors.white,
+        size: 100.0,
+      ),
     );
   }
 }
